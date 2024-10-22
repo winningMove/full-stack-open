@@ -55,11 +55,15 @@ const App = () => {
       />
       <button onClick={handleVoteClick}>Vote</button>
       <button onClick={handleNextClick}>Next anecdote</button>
-      <Quote
-        title="Anecdote with Most Votes"
-        anecdote={anecdotes[highestVotesIndex.current]}
-        votes={votes[highestVotesIndex.current]}
-      />
+      {votes[highestVotesIndex.current] ? (
+        <Quote
+          title="Anecdote with Most Votes"
+          anecdote={anecdotes[highestVotesIndex.current]}
+          votes={votes[highestVotesIndex.current]}
+        />
+      ) : (
+        <p>No votes yet</p>
+      )}
     </>
   );
 };
