@@ -49,36 +49,40 @@ const App = () => {
     if (!(newName && newNumber)) return;
 
     const existingEntry = entries.find((entry) => entry.name === newName);
-    const isReplaceConfirmed = existingEntry
-      ? confirm(
+
+    if (existingEntry) {
+      if (
+        confirm(
           `${newName} is already included in the phonebook. Replace their number with a new one?`
         )
-      : false;
-
-    try {
-      if (existingEntry && isReplaceConfirmed) {
-        const newEntry = await entryService.update(existingEntry.id, {
-          ...existingEntry,
-          number: newNumber,
-        });
-        setEntries(
-          entries.map((entry) => (entry.id !== newEntry.id ? entry : newEntry))
-        );
-        displayAlert(false, `Replaced ${newEntry.name}'s number`);
-      } else if (!existingEntry) {
+      ) {
+        try {
+          const newEntry = await entryService.update(existingEntry.id, {
+            ...existingEntry,
+            number: newNumber,
+          });
+          setEntries(
+            entries.map((entry) =>
+              entry.id !== newEntry.id ? entry : newEntry
+            )
+          );
+          displayAlert(false, `Replaced ${newEntry.name}'s number`);
+        } catch (error) {
+          console.error(error.message);
+          displayAlert(true, `${newName}'s data was previously removed`);
+          setEntries(entries.filter((entry) => entry.id !== existingEntry.id));
+        }
+      }
+    } else {
+      try {
         const newEntry = await entryService.create({
           name: newName,
           number: newNumber,
         });
         setEntries([...entries, newEntry]);
         displayAlert(false, `Added ${newEntry.name}`);
-      }
-    } catch (error) {
-      console.error(error.message);
-      if (existingEntry) {
-        displayAlert(true, `${newName}'s data was previously removed`);
-        setEntries(entries.filter((entry) => entry.id !== existingEntry.id));
-      } else {
+      } catch (error) {
+        console.error(error.message);
         displayAlert(true, "Failed to add new entry");
       }
     }
