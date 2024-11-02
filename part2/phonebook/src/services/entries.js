@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:3001/entries";
+// modified to work with backend from part3
+const baseUrl = "/api/persons";
 
 const getAll = async () => {
   const { data } = await axios.get(baseUrl);

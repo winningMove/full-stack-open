@@ -69,8 +69,14 @@ const App = () => {
           displayAlert(false, `Replaced ${newEntry.name}'s number`);
         } catch (error) {
           console.error(error.message);
-          displayAlert(true, `${newName}'s data was previously removed`);
-          setEntries(entries.filter((entry) => entry.id !== existingEntry.id));
+          if (error.response.data.error) {
+            displayAlert(true, error.response.data.error);
+          } else {
+            displayAlert(true, `${newName}'s data was previously removed`);
+            setEntries(
+              entries.filter((entry) => entry.id !== existingEntry.id)
+            );
+          }
         }
       }
     } else {
@@ -83,7 +89,10 @@ const App = () => {
         displayAlert(false, `Added ${newEntry.name}`);
       } catch (error) {
         console.error(error.message);
-        displayAlert(true, "Failed to add new entry");
+        displayAlert(
+          true,
+          error.response.data.error ?? "Failed to add new entry"
+        );
       }
     }
 
