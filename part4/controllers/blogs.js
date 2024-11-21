@@ -25,6 +25,7 @@ blogRouter
         likes: likes ?? 0,
         user: user._id,
       }).save();
+      await newBlog.populate("user", "-blogs");
 
       user.blogs.push(newBlog._id);
       await user.save();
@@ -35,23 +36,22 @@ blogRouter
     }
   });
 
+// PUT updated to work with frontend from part5
 blogRouter
   .route("/:id")
-  .put(userExtractor, async (req, res, next) => {
-    if (req.body.likes === undefined)
-      return res.status(400).send({ error: "missing likes field" });
-
+  .put(async (req, res, next) => {
+    if (Object.keys(req.body).length !== 5) {
+      return res.status(400).send({ error: "missing field" });
+    }
     try {
-      const { user } = req;
-      const blog = await Blog.findById(req.params.id);
-      if (String(blog.user) !== String(user.id)) {
-        return res
-          .status(403)
-          .send({ error: "current user cannot update this blog" });
-      }
-      blog.likes = req.body.likes;
-      const updated = await blog.save();
-      res.json(updated);
+      const updatedBlog = await Blog.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+          new: true,
+        }
+      ).populate("user", "-blogs");
+      res.json(updatedBlog);
     } catch (err) {
       next(err);
     }

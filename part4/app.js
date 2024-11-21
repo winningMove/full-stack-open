@@ -23,6 +23,15 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);
 
+if (process.env.NODE_ENV === "test") {
+  try {
+    const { default: testingRouter } = await import("./controllers/testing.js");
+    app.use("/api/testing", testingRouter);
+  } catch (err) {
+    console.error("Failed to dynamically load testing router:", err.message);
+  }
+}
+
 app.use(unknownEndpoint, errHandler);
 
 export default app;
