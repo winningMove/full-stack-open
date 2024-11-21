@@ -1,0 +1,17 @@
+{
+  "name": "bloglist-e2e-testing",
+  "version": "0.0.1",
+  "description": "Playwright testing for the Blog List app",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:report": "playwright show-report"
+  },
+  "author": "winningMove",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.48.2",
+    "@types/node": "^22.9.0"
+  }
+}

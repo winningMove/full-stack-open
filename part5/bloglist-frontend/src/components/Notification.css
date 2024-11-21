@@ -1,0 +1,8 @@
+.notification {
+  background-color: lightgrey;
+  outline: 1px solid yellow;
+  width: min(75ch, 75%);
+  border-radius: 5px;
+  padding: 1px;
+  padding-left: 10px;
+}
