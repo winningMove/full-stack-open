@@ -171,36 +171,47 @@ describe("with some blogs and one user initially in the database", () => {
     });
   });
 
-  describe("PUT /api/blogs/:id", () => {
-    it("succeeds", async () => {
-      const blogToUpdate = await Blog.findOne({});
+  // PUT tests changed to work with the part5 modifications to the frontend
+  describe("PUT /api/blogs/:id", async () => {
+    let firstBlog, updatedBlog;
 
+    beforeEach(async () => {
+      firstBlog = await Blog.findOne({});
+      updatedBlog = {
+        title: firstBlog.title,
+        author: firstBlog.author,
+        url: firstBlog.url,
+        likes: firstBlog.likes + 1,
+        user: String(firstBlog.user),
+      };
+    });
+
+    it("succeeds", async () => {
       const res = await req
-        .put(`/api/blogs/${blogToUpdate.id}`)
-        .set("Authorization", `Bearer ${validToken}`)
-        .send({ likes: 100 })
+        .put(`/api/blogs/${firstBlog.id}`)
+        .send(updatedBlog)
         .expect(200)
         .expect("Content-Type", /json/);
-      assert.strictEqual(res.body.likes, 100);
-      const shouldBeUpdated = await Blog.findById(blogToUpdate.id);
-      assert.strictEqual(shouldBeUpdated.likes, 100);
+      assert.strictEqual(res.body.likes, firstBlog.likes + 1);
+      const shouldBeUpdated = await Blog.findById(firstBlog.id);
+      assert.strictEqual(shouldBeUpdated.likes, firstBlog.likes + 1);
     });
 
     it("fails with bad id", async () => {
       const res = await req
         .put(`/api/blogs/8sdg86gh83`)
         .set("Authorization", `Bearer ${validToken}`)
-        .send({ likes: 100 })
+        .send(updatedBlog)
         .expect(400);
       assert.strictEqual(res.body.error, "malformed id");
     });
 
     it("fails with missing likes field in content", async () => {
-      const blogToUpdate = await Blog.findOne({});
+      delete updatedBlog.likes;
+      updatedBlog["liks"] = 1000;
       const res = await req
-        .put(`/api/blogs/${blogToUpdate.id}`)
-        .set("Authorization", `Bearer ${validToken}`)
-        .send({ lik: 100 })
+        .put(`/api/blogs/${firstBlog.id}`)
+        .send(updatedBlog)
         .expect(400);
       assert.strictEqual(res.body.error, "missing likes field");
     });

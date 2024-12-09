@@ -7,7 +7,10 @@ userRouter
   .route("/")
   .get(async (_, res, next) => {
     try {
-      const users = await User.find({}).populate("blogs", "-likes -user");
+      const users = await User.find({}).populate(
+        "blogs",
+        "-likes -user -comments"
+      );
       res.json(users);
     } catch (err) {
       next(err);

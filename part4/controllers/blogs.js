@@ -43,6 +43,9 @@ blogRouter
     if (Object.keys(req.body).length !== 5) {
       return res.status(400).send({ error: "missing field" });
     }
+    if (!Object.keys(req.body).includes("likes")) {
+      return res.status(400).send({ error: "missing likes field" });
+    }
     try {
       const updatedBlog = await Blog.findByIdAndUpdate(
         req.params.id,
@@ -74,5 +77,20 @@ blogRouter
       next(err);
     }
   });
+
+// Added to enable part7 functionality
+blogRouter.route("/:id/comments").post(async (req, res, next) => {
+  if (!req.body.comment)
+    return res.status(400).send({ error: "missing comment field" });
+
+  try {
+    const blogToCommentOn = await Blog.findById(req.params.id);
+    blogToCommentOn.comments.push(req.body.comment);
+    await blogToCommentOn.save();
+    res.status(201).json({ newComment: req.body.comment });
+  } catch (err) {
+    next(err);
+  }
+});
 
 export default blogRouter;
